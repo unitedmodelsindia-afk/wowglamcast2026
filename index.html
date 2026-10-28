@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wow Glam Digital Cast</title>
+<script src="config.js"></script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#1a120c">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1a120c;--bg2:#241a12;--line:#5a4720;--gold:#cfaa4a;--tx:#f6efe0;--mut:#cdbea4;--ok:#7fb069;--bad:#d9685a;--inp:#2a1d13}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 Inter,system-ui,sans-serif}
+#app{max-width:480px;margin:0 auto;min-height:100vh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.logo{font:italic 600 30px 'Cormorant Garamond',Georgia,serif;color:var(--gold)}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+main{padding:18px}h2{font:italic 600 26px 'Cormorant Garamond',Georgia,serif;color:var(--gold);margin:0 0 12px}
+.sub{color:var(--mut);font-size:14px}button,input,select{font:inherit;color:var(--tx)}
+.btn{display:block;width:100%;background:var(--gold);color:#1a120c;border:0;border-radius:10px;padding:14px;font-weight:600;margin:10px 0;cursor:pointer}
+.btn.ghost{background:var(--bg2);color:var(--tx);border:1px solid var(--line)}.btn.sm{width:auto;display:inline-block;padding:8px 16px;margin:0}
+label{display:block;color:var(--mut);font-size:14px;margin:14px 0 6px}
+input,select{width:100%;background:var(--inp);border:1px solid var(--line);border-radius:10px;padding:12px}
+input[type=checkbox]{width:auto;margin-right:8px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:12px}.seg button{background:var(--inp);border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer}.seg .on{border-color:var(--gold);color:var(--gold)}
+.card{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:18px;background:var(--bg2)}
+.ch{display:flex;align-items:center;gap:12px;padding:12px}.ch .g{flex:1}.ch b{display:block}
+.item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #3a2c1a;align-items:center}.item .g{flex:1;min-width:0;overflow-wrap:anywhere}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat div{background:var(--bg2);border-radius:12px;padding:18px}.stat b{font-size:34px;font-weight:500;display:block}
+.err{color:var(--bad);font-size:14px;margin:8px 0}a.l{color:var(--mut);text-decoration:underline;cursor:pointer}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:9}
+.sh{width:100%;max-width:480px;max-height:85%;overflow-y:auto;background:var(--bg);border:1px solid var(--line);border-radius:22px 22px 0 0;padding:20px 18px}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--gold);color:#1a120c;padding:10px 18px;border-radius:20px;font-weight:600;z-index:20}
+.gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;aspect-ratio:4/5;background:#120c07;scrollbar-width:none}.gal::-webkit-scrollbar{display:none}
+.gal>div{flex:none;width:100%;scroll-snap-align:center;background-size:cover;background-position:center;display:grid;place-items:center;font-size:96px;color:rgba(246,239,224,.18)}
+.mc{position:relative}.mc .ov{position:absolute;left:0;right:0;bottom:0;padding:44px 14px 12px;background:linear-gradient(transparent,rgba(10,6,3,.9));pointer-events:none}
+.mc .ov b{font-size:19px}.mc .cnt{position:absolute;top:10px;right:10px;background:rgba(10,6,3,.65);border-radius:12px;padding:2px 10px;font-size:12px}
+.sk{background:linear-gradient(90deg,var(--bg2),var(--inp),var(--bg2));background-size:200% 100%;border-radius:12px}
+.hero{text-align:center;padding:44px 0 10px}.steps{display:grid;gap:10px;margin:14px 0}.steps div{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px}.steps b{color:var(--gold)}
+.empty{text-align:center;padding:36px 10px;color:var(--mut)}.empty .big{font-size:40px;margin-bottom:6px}
+.pg{height:8px;background:var(--inp);border-radius:8px;overflow:hidden;margin:6px 0}.pg i{display:block;height:100%;background:var(--gold)}
+.btn:active{transform:scale(.98)}
+.auto-badge{background:rgba(207,170,74,.18);color:var(--gold);border:1px solid var(--gold);border-radius:12px;padding:3px 9px;font-size:11px;font-weight:600;cursor:pointer}
+.auto-badge.off{background:rgba(217,104,90,.18);color:var(--bad);border-color:var(--bad)}
+.ph-prev-bar{display:flex;align-items:center;justify-content:space-between;margin:8px 0 4px}
+.ph-prev-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:6px 0 12px}
+.ph-prev-card{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg2)}
+.ph-prev-img{aspect-ratio:4/5;background-size:cover;background-position:center}
+.ph-prev-tag{position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,.75);color:var(--gold);font-size:9px;padding:1px 4px;border-radius:4px}
+.ph-prev-del{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.75);color:#fff;border:none;cursor:pointer}
+</style></head><body><div id="app"></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,getDocs,query,where,addDoc,onSnapshot,orderBy,writeBatch,arrayUnion} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const DC=window.DC||{cfg:{apiKey:"PASTE_API_KEY",authDomain:"PASTE",projectId:"PASTE",appId:"PASTE"},support:"wowglamentertainment@gmail.com"};
+const cfg=DC.cfg;
+const ADMINS=["unitedmodelsindia@gmail.com","wowglamentertainment@gmail.com","acecraftmedia@gmail.com"];
+const isAdmin=u=>u&&ADMINS.includes(u.email)&&u.emailVerified;
+const isMgr=async u=>{try{return !!(u&&u.emailVerified&&u.email&&(await getDoc(doc(db,"managers",u.email.toLowerCase()))).exists())}catch(_){return false}};
+const SUPPORT=DC.support||"wowglamentertainment@gmail.com";
+const TIMES=[];for(let h=6;h<=22;h++)TIMES.push((h%12||12)+":00 "+(h<12?"AM":"PM"));
+const ST={requested:"Sent to Wow Glam Digital Cast for review",posted:"Sent to the model",accepted:"Accepted",declined:"Declined by the model",rejected:"Not available",cancelled:"Cancelled",completed:"Completed"};
+const RST={new:"Wow Glam Digital Cast is finding the best matches for you",matched:"Suggestions are ready",closed:"Closed"};
+const CATS=["Model","Actor","Hostess","Anchor","Promoter","Volunteer"],RANK={C:1,B:2,A:3};
+const TERMS=[["Eligibility","You must be 18 or older."],["Contact details stay hidden","Mobile numbers and emails are never shown to clients or models."],["Budgets and pay","A client's budget is visible only to Wow Glam Digital Cast."],["Bookings","Work must be booked through the app."],["Chat","Communication happens in-app."],["Safety","Professional work only."],["Your data","We collect only what is needed."],["Law","Governed by the laws of India."]];
+let unsub=null;
+const BADC=/(\d[\s.\-]?){8,}|\d{4,}|https?:|www|\.(com|in|me|net|org|co)|@|[₹$]|(rs|inr|rupee|rupees)/i;
+const BAD=/(\d[\s.\-]?){8,}|https?:|www\.|\.com|\.in|@/i;
+const $=s=>document.querySelector(s),app=$("#app"),val=id=>($("#"+id)||{}).value||"";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const inr=n=>"₹"+Number(n).toLocaleString("en-IN");
+const hue=s=>[...s].reduce((a,c)=>a+c.charCodeAt(0),0)%360;
+const photo=m=>m.p&&m.p.startsWith("data:image/jpeg")?`url(${m.p})`:`linear-gradient(160deg,hsl(${hue(m.name||"x")} 25% 28%),#1a120c)`;
+const toast=(t,ms=2500)=>{const e=document.createElement("div");e.className="toast";e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),ms)};
+const iso=d=>new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10),todayStr=()=>iso(new Date());
+const tierOf=(b,t)=>!(t.x>0)?"":b>=t.z?"A":b>=t.y?"B":b>=t.x?"C":"";
+const CONFIGURED=!Object.values(cfg).some(v=>!v||/^(PASTE|YOUR_)/.test(String(v)));
+let auth,db;if(CONFIGURED){try{const a=initializeApp(cfg);auth=getAuth(a);db=getFirestore(a);}catch(e){console.error(e)}}
+let S={role:"",brand:null,note:"",lang:"en",aq:"",pq:"",pmap:{},notes:{},logs:[],reports:[],v:"home",user:null,err:"",list:[],mine:null,priv:{},bk:[],posts:[],reqs:[],sug:{},likes:[],busy:[],busyMap:{},likesMap:{},tiers:{x:"",y:"",z:""},mgr:false,mgrs:[],full:{},seen:{},pn:12,autosize:true,isb:false,bmap:{},g:"",photos:[],rate:{},rv:[],loading:false,sheet:false,started:false,msgs:[],match:null};
+const resetS=()=>{Object.assign(S,{mgr:false,mgrs:[],full:{},seen:{},pn:12,role:"",brand:null,note:"",bk:[],posts:[],reqs:[],list:[],sug:{},likes:[],busy:[],busyMap:{},likesMap:{},mine:null,priv:{},rate:{},rv:[],photos:[],g:"",match:null,sheet:false,isb:false,bmap:{}})};
+const logA=(act,ref)=>addDoc(collection(db,"logs"),{act,ref:String(ref||""),at:Date.now()}).catch(()=>{});
+
+async function load(){
+ try{
+  if(S.user&&S.v!=="admin"){try{S.isb=(await getDoc(doc(db,"blocked",S.user.uid))).exists()}catch(_){S.isb=false}}
+  const cq=(c,f)=>getDocs(query(collection(db,c),where(f,"==",S.user.uid))).then(x=>x.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.at-a.at));
+  const all=c=>getDocs(collection(db,c)).then(x=>x.docs.map(d=>({id:d.id,...d.data()})));
+  if(S.v==="admin"){
+   const M=S.mgr;
+   const c=await getDoc(doc(db,"settings","config"));S.autosize=c.exists()?c.data().auto!==false:true;
+   S.bmap={};if(!M)(await all("blocked")).forEach(x=>S.bmap[x.id]=true);
+   S.pmap={};(await all("posts")).forEach(x=>S.pmap[x.id]=x);S.notes={};if(!M)(await all("notes")).forEach(x=>S.notes[x.id]=x.text);S.reports=(await all("reports")).sort((a,b)=>b.at-a.at);S.logs=M?[]:(await all("logs")).sort((a,b)=>b.at-a.at).slice(0,15);
+   if(!M){const t=await getDoc(doc(db,"settings","tiers"));if(t.exists())S.tiers=t.data();S.mgrs=(await all("managers")).map(x=>x.id).sort()}
+   const s=await getDocs(collection(db,"models"));S.list=await Promise.all(s.docs.map(async d=>{let pr={};if(!M){const p=await getDoc(doc(db,"private",d.id));pr=p.exists()?p.data():{}}return{...d.data(),priv:pr}}));
+   S.bk=(await all("bookings")).sort((a,b)=>b.at-a.at);S.reqs=(await all("requirements")).sort((a,b)=>b.at-a.at);
+  }else if(["req","prof","mybook"].includes(S.v)){
+   const b=await getDoc(doc(db,"brands",S.user.uid));S.brand=b.exists()?b.data():null;if(!S.brand){S.v="brandprofile";return}
+   S.list=(await getDocs(query(collection(db,"models"),where("v","==",true)))).docs.map(d=>d.data());
+   S.reqs=await cq("requirements","cid");S.bk=await cq("bookings","cid");
+   S.sug={};(await cq("suggestions","cid")).forEach(x=>S.sug[x.rid]=x.mids||[]);
+   const l=await getDoc(doc(db,"likes",S.user.uid));S.likes=l.exists()?l.data().mids||[]:[]
+  }else if(S.v==="model"){
+   const d=await getDoc(doc(db,"models",S.user.uid));S.mine=d.exists()?d.data():null;
+   if(S.mine){try{const ph=await getDoc(doc(db,"photos",S.user.uid));S.full[S.user.uid]=ph.exists()?ph.data().ps||[]:[]}catch(_){}const p=await getDoc(doc(db,"private",S.user.uid));S.priv=p.exists()?p.data():{};S.posts=await cq("posts","mid");
+    const b=await getDoc(doc(db,"busy",S.user.uid));S.busy=b.exists()?b.data().dates||[]:[]}}
+ }catch(e){console.error(e);S.err="Could not load data."}
+}
+async function go(v){S.v=v;S.err="";render();await load();render()}
+const getRole=async uid=>{try{const d=await getDoc(doc(db,"users",uid));return d.exists()?d.data().role:""}catch(_){return""}};
+async function login(want){
+ S.err="";resetS();
+ if(!auth){S.err="App setup incomplete: add Firebase keys in config.js.";S.v="home";return render()}
+ try{const u=(await signInWithPopup(auth,new GoogleAuthProvider())).user;S.user=u;
+  if(want==="admin"){if(isAdmin(u)){S.mgr=false;return await go("admin")}if(await isMgr(u)){S.mgr=true;return await go("admin")}await signOut(auth);S.user=null;S.err="Not an admin.";S.v="home";return render()}
+  const want2=want==="client"?"client":"model";let r=await getRole(u.uid);
+  if(!r){await setDoc(doc(db,"users",u.uid),{role:want2,at:Date.now()});r=want2}
+  S.role=r;await go(r==="client"?"req":"model")}
+ catch(e){console.error(e);S.err=e&&e.code==="auth/unauthorized-domain"?"Login blocked: add this website domain in Firebase > Authentication > Settings > Authorized domains.":e&&e.code==="auth/popup-closed-by-user"?"Login cancelled.":"Login failed. Please try again.";S.v="home";render()}
+}
+
+if(auth){
+  onAuthStateChanged(auth, async u => {
+    S.user = u;
+    if (u) {
+      if (isAdmin(u)) { S.mgr = false; if (S.v !== "admin") await go("admin"); }
+      else if (await isMgr(u)) { S.mgr = true; if (S.v !== "admin") await go("admin"); }
+      else { const r = await getRole(u.uid); S.role = r; if (S.v === "home" || !S.v) await go(r === "client" ? "req" : "model"); }
+    } else { if (S.v !== "home") { S.v = "home"; render(); } }
+    if (!S.started) { S.started = true; render(); }
+  });
+}
+
+function matches(r){return S.list.filter(m=>m.v&&RANK[m.t||"C"]<=RANK[r.tier]&&(r.cat==="Any"||m.cat===r.cat)&&!((S.busyMap[m.uid]||{}).dates||[]).includes(r.date)).map(m=>({m,s:50,w:["match"]}))}
+const head=()=>`<header><span class="logo">Wow Glam Digital Cast</span><span class="ic">${S.user?'<button class="btn ghost sm" data-a="out">Log out</button>':''}</span></header>`;
+const errb=()=>(S.err?`<div class="err">${esc(S.err)}</div>`:"");
+const tabs=()=>`<div class="seg" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">${[["req","Requirements"],["prof","Profiles"],["mybook","Bookings"]].map(t=>`<button data-a="tab" data-v="${t[0]}" class="${S.v===t[0]?"on":""}">${t[1]}</button>`).join("")}</div>`;
+const gal=m=>{const l=(S.full[m.uid]&&S.full[m.uid].length)?S.full[m.uid]:m.p?[m.p]:[];return`<div class="gal">${l.length?l.map(x=>`<div style="background-image:url(${x})" role="img"></div>`).join(""):`<div style="background-image:linear-gradient(160deg,#241a12,#1a120c)">${esc((m.name||"?")[0])}</div>`}</div>`}
+const mcard=(m,extra)=>`<div class="card"><div class="mc">${gal(m)}<div class="ov"><b>${esc(m.name)}</b><div class="sub">${esc(m.cat)} · ${esc(m.city)}</div></div></div><div class="ch" style="justify-content:flex-end">${extra}</div></div>`;
+
+function autoSizePhoto(i,targetW=600,targetH=750){
+ const c=document.createElement("canvas");c.width=targetW;c.height=targetH;
+ const ctx=c.getContext("2d");ctx.fillStyle="#160f09";ctx.fillRect(0,0,targetW,targetH);
+ const fs=Math.min(targetW/i.width,targetH/i.height),fw=i.width*fs,fh=i.height*fs;
+ ctx.drawImage(i,(targetW-fw)/2,(targetH-fh)/2,fw,fh);
+ return c.toDataURL("image/jpeg",.78);
+}
+const prepPhoto=async f=>{const img=new Image();const u=URL.createObjectURL(f);return new Promise(res=>{img.onload=()=>{URL.revokeObjectURL(u);res(autoSizePhoto(img))};img.src=u})}
+
+function render(){
+ let h="";
+ if(S.v==="home")h=`<main><div class="hero"><div class="logo" style="font-size:44px">Wow Glam Digital Cast</div><p class="sub">Private talent casting ecosystem.</p></div><button class="btn" data-a="client">Brand / Client: Log in</button><button class="btn ghost" data-a="model">Talent: Log in</button><button class="btn ghost" data-a="admin">Admin</button>${errb()}</main>`;
+ else if(S.v==="brandprofile")h=`${head()}<main><h2>Brand profile</h2>${errb()}<label>Company / Brand Name</label><input id="bc"><label>Contact Person</label><input id="bp"><label>City</label><input id="bt"><button class="btn" data-a="savebrand">Save and Continue</button></main>`;
+ else if(S.v==="req")h=`${head()}<main>${tabs()}<h2>Requirements</h2><button class="btn" data-a="newreq">Post Requirement</button>${errb()}${S.reqs.length?S.reqs.map(r=>`<div class="item"><div class="g"><b>${esc(r.cat||"Any")} · ${esc(r.city)} · ${esc(r.date)}</b><div class="sub">${esc(RST[r.status]||r.status||"")}</div></div></div>`).join(""):`<div class="empty"><div class="big">📋</div>No requirements yet.</div>`}</main>`;
+ else if(S.v==="prof")h=`${head()}<main>${tabs()}<h2>Profiles</h2>${S.list.length?S.list.map(m=>mcard(m,`<button class="btn sm${S.likes.includes(m.uid)?" ghost":""}" data-a="like" data-v="${m.uid}">${S.likes.includes(m.uid)?"Liked":"Like"}</button>`)).join(""):`<div class="empty"><div class="big">✨</div>No profiles yet.</div>`}</main>`;
+ else if(S.v==="mybook")h=`${head()}<main>${tabs()}<h2>Bookings</h2>${S.bk.length?S.bk.map(b=>`<div class="item"><div class="g"><b>${esc(b.mname)} · ${esc(b.date)}</b><div class="sub">${esc(ST[b.status]||b.status||"")}</div></div></div>`).join(""):`<div class="empty"><div class="big">📅</div>No bookings yet.</div>`}</main>`;
+ else if(S.v==="model")h=head()+(S.mine?`<main><h2>Hi ${esc(S.mine.name)}</h2><p class="sub">Profile Live</p></main>`:`<main><h2>Create Profile</h2>${errb()}<label>Full Name</label><input id="n"><label>Mobile</label><input id="mo" type="tel" inputmode="numeric" maxlength="10"><label>City</label><input id="ct"><label>Category</label><select id="ca">${CATS.map(c=>`<option>${c}</option>`).join("")}</select><button class="btn" data-a="save">Save Profile</button></main>`);
+ else if(S.v==="admin")h=head()+`<main><h2>Admin Dashboard</h2><p class="sub">Manage users and requirements.</p></main>`;
+ app.innerHTML=h+(S.sheet==="req"?`<div class="sheet"><div class="sh"><h2>Post Requirement</h2>${errb()}<label>Company</label><input id="cn" value="${esc((S.brand||{}).cn||"")}"><label>Category</label><select id="rc"><option>Any</option>${CATS.map(c=>`<option>${c}</option>`).join("")}</select><label>City</label><input id="rct"><label>Date</label><input id="dt" type="date" min="${todayStr()}"><button class="btn" data-a="sendreq">Submit</button><button class="btn ghost" data-a="close">Cancel</button></div></div>`:"");
+}
+
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,v=b.dataset.v;
+ if(a==="model")return login("model");if(a==="client")return login("client");if(a==="admin")return login("admin");
+ if(a==="tab")return go(v);if(a==="home")return go("home");
+ if(a==="out"){try{await signOut(auth)}catch(_){}resetS();S.user=null;return go("home")}
+ S.err="";
+ if(a==="newreq")S.sheet="req";
+ else if(a==="close")S.sheet=false;
+ else if(a==="savebrand"){if(!val("bc").trim()||!val("bp").trim()||!val("bt").trim())S.err="Please fill all fields.";else{try{await setDoc(doc(db,"brands",S.user.uid),{cn:val("bc").trim(),pn:val("bp").trim(),city:val("bt").trim(),at:Date.now()});return go("req")}catch(err){console.error(err);S.err="Could not save. Please try again."}}}
+ else if(a==="sendreq"){if(!val("cn").trim()||!val("rct").trim()||!val("dt"))S.err="Please fill company, city and date.";else{try{await addDoc(collection(db,"requirements"),{cid:S.user.uid,cn:val("cn").trim(),cat:val("rc")||"Any",city:val("rct").trim(),date:val("dt"),status:"new",at:Date.now()});S.sheet=false;toast("Requirement posted");await load()}catch(err){console.error(err);S.err="Could not post. Please try again."}}}
+ else if(a==="save"){const n=val("n").trim(),mo=val("mo").replace(/\D/g,""),ct=val("ct").trim();
+  if(!n||!ct)S.err="Please fill name and city.";else if(!/^[6-9]\d{9}$/.test(mo))S.err="Enter a valid 10-digit mobile number.";
+  else{try{await setDoc(doc(db,"private",S.user.uid),{mobile:mo,email:S.user.email||"",at:Date.now()});await setDoc(doc(db,"models",S.user.uid),{uid:S.user.uid,name:n,city:ct,cat:val("ca"),v:true,at:Date.now()});toast("Profile saved");await load()}catch(err){console.error(err);S.err="Could not save. Please try again."}}}
+ else if(a==="like"&&v){try{const on=S.likes.includes(v);S.likes=on?S.likes.filter(x=>x!==v):[...S.likes,v];await setDoc(doc(db,"likes",S.user.uid),{mids:S.likes,at:Date.now()})}catch(err){console.error(err);S.err="Could not save like."}}
+ render();
+});
+if(!CONFIGURED)S.err="Setup pending: Firebase keys missing in config.js.";
+render();
+</script></body></html>

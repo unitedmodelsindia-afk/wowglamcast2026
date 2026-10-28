@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function me(uid) { return signedIn() && request.auth.uid == uid; }
+    function isAdmin() {
+      return signedIn() && request.auth.token.email_verified == true &&
+        request.auth.token.email in ['unitedmodelsindia@gmail.com','wowglamentertainment@gmail.com','acecraftmedia@gmail.com'];
+    }
+    function isMgr() {
+      return signedIn() && request.auth.token.email_verified == true &&
+        exists(/databases/$(database)/documents/managers/$(request.auth.token.email.lower()));
+    }
+    function staff() { return isAdmin() || isMgr(); }
+
+    match /users/{uid}       { allow read, write: if me(uid) || isAdmin(); }
+    match /brands/{uid}      { allow read, write: if me(uid) || staff(); }
+    match /models/{uid}      { allow read: if signedIn(); allow write: if me(uid) || staff(); }
+    match /private/{uid}     { allow read, write: if me(uid) || isAdmin(); }
+    match /photos/{uid}      { allow read: if signedIn(); allow write: if me(uid) || staff(); }
+    match /busy/{uid}        { allow read: if signedIn(); allow write: if me(uid) || staff(); }
+    match /likes/{uid}       { allow read, write: if me(uid) || staff(); }
+    match /blocked/{uid}     { allow read: if me(uid) || staff(); allow write: if isAdmin(); }
+    match /managers/{email}  { allow read: if isAdmin() || (signedIn() && request.auth.token.email.lower() == email); allow write: if isAdmin(); }
+    match /settings/{id}     { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /notes/{id}        { allow read, write: if isAdmin(); }
+    match /logs/{id}         { allow create: if signedIn(); allow read: if isAdmin(); }
+    match /reports/{id}      { allow create: if signedIn(); allow read, update: if staff(); }
+    match /requirements/{id} {
+      allow create: if signedIn() && request.resource.data.cid == request.auth.uid;
+      allow read: if staff() || (signedIn() && resource.data.cid == request.auth.uid);
+      allow update, delete: if staff();
+    }
+    match /suggestions/{id}  { allow read: if staff() || (signedIn() && resource.data.cid == request.auth.uid); allow write: if staff(); }
+    match /bookings/{id}     { allow read: if staff() || (signedIn() && (resource.data.cid == request.auth.uid || resource.data.mid == request.auth.uid)); allow write: if staff(); }
+    match /posts/{id}        { allow read: if staff() || (signedIn() && resource.data.mid == request.auth.uid); allow write: if staff(); }
+  }
+}

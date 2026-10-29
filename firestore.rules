@@ -2,6 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
+    function real() { return signedIn() && request.auth.token.firebase.sign_in_provider != 'anonymous'; }
     function me(uid) { return signedIn() && request.auth.uid == uid; }
     function isAdmin() {
       return signedIn() && request.auth.token.email_verified == true &&
@@ -25,9 +26,9 @@ service cloud.firestore {
     match /settings/{id}     { allow read: if signedIn(); allow write: if isAdmin(); }
     match /notes/{id}        { allow read, write: if isAdmin(); }
     match /logs/{id}         { allow create: if signedIn(); allow read: if isAdmin(); }
-    match /reports/{id}      { allow create: if signedIn(); allow read, update: if staff(); }
+    match /reports/{id}      { allow create: if real(); allow read, update: if staff(); }
     match /requirements/{id} {
-      allow create: if signedIn() && request.resource.data.cid == request.auth.uid;
+      allow create: if real() && request.resource.data.cid == request.auth.uid;
       allow read: if staff() || (signedIn() && resource.data.cid == request.auth.uid);
       allow update: if staff() || (signedIn() && resource.data.cid == request.auth.uid && request.resource.data.cid == resource.data.cid && request.resource.data.status == resource.data.status);
       allow delete: if staff();
@@ -46,11 +47,11 @@ service cloud.firestore {
     function inChat(id) { return signedIn() && (id.split('_')[0] == request.auth.uid || id.split('_')[1] == request.auth.uid); }
     match /chats/{id} {
       allow read: if staff() || inChat(id) || (signedIn() && (resource.data.cid == request.auth.uid || resource.data.mid == request.auth.uid));
-      allow create: if signedIn() && id == request.auth.uid + '_' + request.resource.data.mid && request.resource.data.cid == request.auth.uid;
+      allow create: if real() && id == request.auth.uid + '_' + request.resource.data.mid && request.resource.data.cid == request.auth.uid;
       allow update: if staff() || (inChat(id) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['last','at','lastFrom']) && clean(request.resource.data.last));
       match /m/{mid} {
         allow read: if staff() || inChat(id);
-        allow create: if inChat(id) && request.resource.data.from == request.auth.uid && clean(request.resource.data.t);
+        allow create: if real() && inChat(id) && request.resource.data.from == request.auth.uid && clean(request.resource.data.t);
       }
     }
   }

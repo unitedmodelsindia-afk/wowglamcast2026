@@ -1,0 +1,27 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.wowglam.digitalcast'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.wowglam.digitalcast'
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+        manifestPlaceholders = [hostName: 'unitedmodelsindia-afk.github.io', defaultUrl: 'https://unitedmodelsindia-afk.github.io/wowglamcast2026/']
+    }
+    signingConfigs {
+        release {
+            storeFile file('../wowglam.jks')
+            storePassword 'wowglam2026'
+            keyAlias 'wowglam'
+            keyPassword 'wowglam2026'
+        }
+    }
+    buildTypes { release { minifyEnabled false; signingConfig signingConfigs.release } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+}

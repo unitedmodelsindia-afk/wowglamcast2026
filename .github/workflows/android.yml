@@ -1,0 +1,39 @@
+name: Build Android APK
+on:
+  push:
+    branches: [android]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: android }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.7' }
+      - name: Create signing key (first run only)
+        run: |
+          if [ ! -f wowglam.jks ]; then
+            keytool -genkeypair -keystore wowglam.jks -alias wowglam -keyalg RSA -keysize 2048 -validity 10000 -storepass wowglam2026 -keypass wowglam2026 -dname "CN=Wow Glam Digital Cast, O=Wow Glam Entertainment, C=IN"
+            git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+            git add wowglam.jks; git commit -m "Add signing key [skip ci]"; git push origin HEAD:android
+          fi
+          keytool -list -v -keystore wowglam.jks -alias wowglam -storepass wowglam2026 | grep -i "SHA256:" | tee sha256.txt
+      - name: Build APK
+        run: gradle :app:assembleRelease --no-daemon
+      - uses: actions/upload-artifact@v4
+        with: { name: wowglam-apk, path: app/build/outputs/apk/release/app-release.apk }
+      - name: Publish APK to website
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk /tmp/wowglam.apk
+          git fetch origin main
+          git checkout -B main origin/main
+          cp /tmp/wowglam.apk wowglam.apk
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git add -f wowglam.apk; git commit -m "Update Android APK [skip ci]" || true
+          git push origin main
+          git push -f origin main:gh-pages main:None

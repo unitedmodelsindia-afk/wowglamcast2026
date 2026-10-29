@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download Wow Glam Digital Cast</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Wow Glam">
+<meta name="theme-color" content="#1a120c">
+<style>
+body{margin:0;background:#1a120c;color:#f6efe0;font:16px/1.5 system-ui,sans-serif;text-align:center}
+.w{max-width:440px;margin:0 auto;padding:40px 20px}
+img{width:96px;height:96px;border-radius:22px}
+h1{font:italic 600 32px Georgia,serif;color:#cfaa4a;margin:16px 0 4px}
+.sub{color:#cdbea4;font-size:14px}
+.btn{display:block;background:#cfaa4a;color:#1a120c;border-radius:12px;padding:15px;font-weight:600;text-decoration:none;margin:14px 0}
+.btn.g{background:#241a12;color:#f6efe0;border:1px solid #5a4720}
+.steps{text-align:left;background:#241a12;border:1px solid #5a4720;border-radius:12px;padding:6px 16px;margin:14px 0}
+.steps p{margin:10px 0}.steps b{color:#cfaa4a}.hide{display:none}
+</style></head><body><div class="w">
+<img src="icon-192.png" alt="Wow Glam">
+<h1>Wow Glam Digital Cast</h1>
+<p class="sub">Private talent casting app</p>
+
+<div id="and" class="hide">
+ <a class="btn" href="wowglam.apk" download>Download for Android</a>
+ <div class="steps"><p><b>1.</b> Tap the button and download the file.</p><p><b>2.</b> Open it. If asked, allow <b>Install unknown apps</b>.</p><p><b>3.</b> Tap <b>Install</b>, then open <b>Wow Glam</b>.</p></div>
+</div>
+
+<div id="ios" class="hide">
+ <div class="steps" id="notsafari" style="display:none"><p>Please open this link in <b>Safari</b> to install.</p></div>
+ <div class="steps"><p><b>1.</b> Tap the <b>Share</b> button (square with arrow) at the bottom of Safari.</p><p><b>2.</b> Scroll and tap <b>Add to Home Screen</b>.</p><p><b>3.</b> Tap <b>Add</b>, then open <b>Wow Glam</b> from your home screen.</p></div>
+</div>
+
+<div id="pc" class="hide">
+ <p class="sub">Open this link on your phone to install.</p>
+ <a class="btn" href="wowglam.apk" download>Android app (APK)</a>
+</div>
+
+<a class="btn g" href="./">Open in browser</a>
+</div>
+<script>
+var u=navigator.userAgent,ios=/iPhone|iPad|iPod/i.test(u)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1),and=/Android/i.test(u);
+document.getElementById(ios?"ios":and?"and":"pc").classList.remove("hide");
+if(ios&&/CriOS|FxiOS|Instagram|FBAN|FBAV|WhatsApp/i.test(u))document.getElementById("notsafari").style.display="block";
+if(and)setTimeout(function(){location.href="wowglam.apk"},800);
+</script>
+</body></html>

@@ -34,5 +34,19 @@ service cloud.firestore {
     match /suggestions/{id}  { allow read: if staff() || (signedIn() && resource.data.cid == request.auth.uid); allow write: if staff(); }
     match /bookings/{id}     { allow read: if staff() || (signedIn() && (resource.data.cid == request.auth.uid || resource.data.mid == request.auth.uid)); allow write: if staff(); }
     match /posts/{id}        { allow read: if staff() || (signedIn() && resource.data.mid == request.auth.uid); allow write: if staff(); }
+    function clean(t) {
+      return t is string && t.size() > 0 && t.size() <= 500 &&
+        !t.lower().matches('(?s).*(([0-9][^a-z0-9]{0,2}){3}[0-9]|https?:|www[.]|[.](com|in|me|net|org|co)([^a-z]|$)|@|₹|[$]|(^|[^a-z])rs([^a-z]|$)|rupee|upi|gpay|paytm|phonepe|whatsapp|wa[.]me|insta|telegram|snapchat|number|mobile|call me|cash|payment|advance|paisa|paise).*');
+    }
+    function inChat(id) { return signedIn() && (id.split('_')[0] == request.auth.uid || id.split('_')[1] == request.auth.uid); }
+    match /chats/{id} {
+      allow read: if staff() || inChat(id);
+      allow create: if signedIn() && id == request.auth.uid + '_' + request.resource.data.mid && request.resource.data.cid == request.auth.uid;
+      allow update: if staff() || (inChat(id) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['last','at']) && clean(request.resource.data.last));
+      match /m/{mid} {
+        allow read: if staff() || inChat(id);
+        allow create: if inChat(id) && request.resource.data.from == request.auth.uid && clean(request.resource.data.t);
+      }
+    }
   }
 }

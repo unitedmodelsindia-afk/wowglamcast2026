@@ -87,7 +87,11 @@ const toast=(t,ms=2500)=>{const e=document.createElement("div");e.className="toa
 const iso=d=>new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10),todayStr=()=>iso(new Date());
 const tierOf=(b,t)=>!(t.x>0)?"":b>=t.z?"A":b>=t.y?"B":b>=t.x?"C":"";
 const CONFIGURED=!Object.values(cfg).some(v=>!v||/^(PASTE|YOUR_)/.test(String(v)));
-let auth,db;if(CONFIGURED){try{const a=initializeApp(cfg);auth=getAuth(a);try{db=initializeFirestore(a,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch(_){db=getFirestore(a)}}catch(e){console.error(e)}}
+const IOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+const APPMODE=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true||document.referrer.startsWith("android-app://")||/; wv\)/.test(navigator.userAgent);
+let _app=APPMODE;try{if(_app)localStorage.setItem("wgApp","1");else _app=localStorage.getItem("wgApp")==="1"&&!!localStorage.getItem("wgWant")}catch(_){}
+const SAMEDOM=_app&&!IOS&&location.hostname==="unitedmodelsindia-afk.github.io";
+let auth,db;if(CONFIGURED){try{const a=initializeApp(SAMEDOM?{...cfg,authDomain:location.hostname}:cfg);auth=getAuth(a);try{db=initializeFirestore(a,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch(_){db=getFirestore(a)}}catch(e){console.error(e)}}
 let S={role:"",brand:null,note:"",lang:"en",aq:"",pq:"",pmap:{},notes:{},logs:[],reports:[],v:"home",user:null,err:"",list:[],mine:null,priv:{},bk:[],posts:[],reqs:[],sug:{},likes:[],busy:[],busyMap:{},likesMap:{},tiers:{x:"",y:"",z:""},mgr:false,mgrs:[],full:{},seen:{},pn:12,autosize:true,isb:false,bmap:{},g:"",photos:[],rate:{},rv:[],loading:false,sheet:false,started:false,msgs:[],match:null,at:"talent",brands:[],newph:[],cs:null,gs:null,cts:[]};
 const resetS=()=>{Object.assign(S,{mgr:false,mgrs:[],full:{},seen:{},pn:12,role:"",brand:null,note:"",bk:[],posts:[],reqs:[],list:[],sug:{},likes:[],busy:[],busyMap:{},likesMap:{},mine:null,priv:{},rate:{},rv:[],photos:[],g:"",match:null,sheet:false,isb:false,bmap:{},brands:[],newph:[],cs:null,gs:null,cts:[]})};
 const logA=(act,ref)=>addDoc(collection(db,"logs"),{act,ref:String(ref||""),at:Date.now()}).catch(()=>{});
@@ -127,8 +131,6 @@ async function load(){
 }
 async function go(v){S.v=v;S.err="";render();await load();render()}
 const getRole=async uid=>{try{const d=await getDoc(doc(db,"users",uid));return d.exists()?d.data().role:""}catch(_){return""}};
-const IOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
-const APPMODE=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true||document.referrer.startsWith("android-app://")||/; wv\)/.test(navigator.userAgent);
 const loginErr=e=>e&&e.code==="auth/unauthorized-domain"?"Login blocked: add this website domain in Firebase > Authentication > Settings > Authorized domains.":e&&e.code==="auth/popup-closed-by-user"?"Login cancelled.":"Login failed ("+((e&&e.code)||"error")+"). Please try again.";
 async function afterLogin(u,want){S.user=u;
   if(want==="admin"){if(isAdmin(u)){S.mgr=false;return await go("admin")}if(await isMgr(u)){S.mgr=true;return await go("admin")}await signOut(auth);S.user=null;S.err="Not an admin: "+(u.email||"")+" is not on the admin list.";S.v="home";return render()}
@@ -139,6 +141,7 @@ async function viaRedirect(want){try{localStorage.setItem("wgWant",want)}catch(_
 async function login(want){
  S.err="";resetS();
  if(!auth){S.err="App setup incomplete: add Firebase keys in config.js.";S.v="home";return render()}
+ if(SAMEDOM)return viaRedirect(want);
  toast("Google login khul raha hai...");try{const u=(await signInWithPopup(auth,new GoogleAuthProvider().setCustomParameters({prompt:"select_account"}))).user;await afterLogin(u,want)}
  catch(e){console.error(e);S.err=loginErr(e);S.v="home";render()}
 }

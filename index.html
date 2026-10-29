@@ -139,9 +139,8 @@ async function viaRedirect(want){try{localStorage.setItem("wgWant",want)}catch(_
 async function login(want){
  S.err="";resetS();
  if(!auth){S.err="App setup incomplete: add Firebase keys in config.js.";S.v="home";return render()}
- if(APPMODE&&!IOS)return viaRedirect(want);
- try{const u=(await signInWithPopup(auth,new GoogleAuthProvider().setCustomParameters({prompt:"select_account"}))).user;await afterLogin(u,want)}
- catch(e){console.error(e);if(e&&["auth/popup-blocked","auth/operation-not-supported-in-this-environment","auth/web-storage-unsupported","auth/internal-error"].includes(e.code))return viaRedirect(want);S.err=loginErr(e);S.v="home";render()}
+ toast("Google login khul raha hai...");try{const u=(await signInWithPopup(auth,new GoogleAuthProvider().setCustomParameters({prompt:"select_account"}))).user;await afterLogin(u,want)}
+ catch(e){console.error(e);S.err=loginErr(e);S.v="home";render()}
 }
 if(auth){getRedirectResult(auth).then(async r=>{let w="";try{w=localStorage.getItem("wgWant")||"";localStorage.removeItem("wgWant")}catch(_){}const u=(r&&r.user)||(w&&auth.currentUser);if(u)await afterLogin(u,w||"model")}).catch(e=>{console.error(e);try{localStorage.removeItem("wgWant")}catch(_){}S.err=loginErr(e);S.v="home";render()})}
 

@@ -40,7 +40,7 @@ service cloud.firestore {
     }
     function inChat(id) { return signedIn() && (id.split('_')[0] == request.auth.uid || id.split('_')[1] == request.auth.uid); }
     match /chats/{id} {
-      allow read: if staff() || inChat(id);
+      allow read: if staff() || inChat(id) || (signedIn() && (resource.data.cid == request.auth.uid || resource.data.mid == request.auth.uid));
       allow create: if signedIn() && id == request.auth.uid + '_' + request.resource.data.mid && request.resource.data.cid == request.auth.uid;
       allow update: if staff() || (inChat(id) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['last','at']) && clean(request.resource.data.last));
       match /m/{mid} {

@@ -59,7 +59,7 @@ input[type=checkbox]{width:auto;margin-right:8px}
 </style></head><body><div id="app"></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getAuth,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getAuth,setPersistence,indexedDBLocalPersistence,browserLocalPersistence,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {serverTimestamp,limit,getFirestore,initializeFirestore,persistentLocalCache,persistentMultipleTabManager,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,getDocs,query,where,addDoc,onSnapshot,orderBy,writeBatch,arrayUnion} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const DC=window.DC||{cfg:{apiKey:"PASTE_API_KEY",authDomain:"PASTE",projectId:"PASTE",appId:"PASTE"},support:"wowglamentertainment@gmail.com"};
@@ -98,7 +98,7 @@ const IOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
 const APPMODE=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true||document.referrer.startsWith("android-app://")||/; wv\)/.test(navigator.userAgent);
 let _app=APPMODE;try{if(_app)localStorage.setItem("wgApp","1");else _app=localStorage.getItem("wgApp")==="1"&&!!localStorage.getItem("wgWant")}catch(_){}
 const SAMEDOM=_app&&!IOS&&location.hostname==="unitedmodelsindia-afk.github.io";
-let auth,db;if(CONFIGURED){try{const a=initializeApp(SAMEDOM?{...cfg,authDomain:location.hostname}:cfg);auth=getAuth(a);try{db=initializeFirestore(a,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch(_){db=getFirestore(a)}}catch(e){console.error(e)}}
+let auth,db;if(CONFIGURED){try{const a=initializeApp(SAMEDOM?{...cfg,authDomain:location.hostname}:cfg);auth=getAuth(a);setPersistence(auth,indexedDBLocalPersistence).catch(()=>setPersistence(auth,browserLocalPersistence).catch(()=>{}));try{db=initializeFirestore(a,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch(_){db=getFirestore(a)}}catch(e){console.error(e)}}
 let S={role:"",brand:null,note:"",lang:"en",aq:"",pq:"",pmap:{},notes:{},logs:[],reports:[],v:"home",user:null,err:"",list:[],mine:null,priv:{},bk:[],posts:[],reqs:[],sug:{},likes:[],busy:[],busyMap:{},likesMap:{},tiers:{x:"",y:"",z:""},mgr:false,mgrs:[],full:{},seen:{},pn:12,autosize:true,isb:false,bmap:{},g:"",photos:[],rate:{},rv:[],loading:false,sheet:false,started:false,msgs:[],match:null,at:"talent",brands:[],newph:[],cs:null,gs:null,cts:[]};
 const resetS=()=>{Object.assign(S,{mgr:false,mgrs:[],full:{},seen:{},pn:12,role:"",brand:null,note:"",bk:[],posts:[],reqs:[],list:[],sug:{},likes:[],busy:[],busyMap:{},likesMap:{},mine:null,priv:{},rate:{},rv:[],photos:[],g:"",match:null,sheet:false,isb:false,bmap:{},brands:[],newph:[],cs:null,gs:null,cts:[]})};
 const logA=(act,ref)=>addDoc(collection(db,"logs"),{act,ref:String(ref||""),at:Date.now()}).catch(()=>{});
@@ -210,6 +210,7 @@ const prepPhoto=async f=>{const img=new Image();const u=URL.createObjectURL(f);r
 
 function render(){
  let h="";
+ if(auth&&!S.started&&S.v==="home"){app.innerHTML=`<main><div class="hero"><div class="logo" style="font-size:44px">Wow Glam Digital Cast</div><p class="sub">Loading...</p></div></main>`;return}
  if(S.v==="home")h=`<main><div class="hero"><div class="logo" style="font-size:44px">Wow Glam Digital Cast</div><p class="sub">Private talent casting ecosystem.</p>${S.pendTp?`<p class="sub" style="color:var(--gold)">Log in to view this talent profile.</p>`:""}</div><button class="btn" data-a="client">Brand / Client: Log in</button><button class="btn ghost" data-a="model">Talent: Log in</button><button class="btn ghost" data-a="admin">Admin</button>${errb()}${standalone()?"":`<div class="seg" style="margin-top:22px"><a class="btn ghost sm" style="text-align:center;text-decoration:none;padding:12px;grid-column:1/-1" href="download.html">Download the App</a></div>`}<div class="foot"><a class="l" data-a="terms">Terms & Privacy</a></div></main>`;
  else if(S.v==="lchoose")h=`<header><a class="l" data-a="lhome">← Back</a><span class="sub">${S.mrole==="client"?"Brand / Client":"Talent"}</span></header><main><h2>How do you want to log in?</h2>${errb()}<button class="btn" data-a="lmob">📱 Mobile number + password</button><button class="btn ghost" data-a="lgoogle">Google se login</button><p class="sub" style="margin-top:12px">Use the same method you signed up with.</p></main>`;
  else if(S.v==="mlogin")h=`<header><a class="l" data-a="lchoose_back">← Back</a><span class="sub">${S.mrole==="client"?"Brand / Client":"Talent"}</span></header><main><h2>${S.mnew?"Create account":"Mobile login"}</h2>${errb()}<label>Mobile number</label><input id="mm" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national"><label>Password</label><input id="mp" type="password" autocomplete="${S.mnew?"new-password":"current-password"}">${S.mnew?`<label>Confirm password</label><input id="mp2" type="password" autocomplete="new-password">`:""}<button class="btn" data-a="mgo">${S.mnew?"Create account":"Login"}</button><button class="btn ghost" data-a="mtog">${S.mnew?"Already have an account? Log in":"Create new account"}</button><p class="sub" style="margin-top:12px">Forgot password? Contact the Wow Glam team.</p></main>`;
@@ -286,5 +287,5 @@ document.addEventListener("change",async e=>{const t=e.target;if(!t.files||!t.fi
 const hm=location.hash.match(/^#t=([\w-]+)/);if(hm){S.tp=hm[1];S.pendTp=hm[1]}
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 if(!CONFIGURED)S.err="Setup pending: Firebase keys missing in config.js.";
-render();
+render();setTimeout(()=>{if(!S.started){S.started=true;render()}},6000);
 </script></body></html>

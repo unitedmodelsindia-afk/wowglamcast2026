@@ -29,7 +29,8 @@ service cloud.firestore {
     match /requirements/{id} {
       allow create: if signedIn() && request.resource.data.cid == request.auth.uid;
       allow read: if staff() || (signedIn() && resource.data.cid == request.auth.uid);
-      allow update, delete: if staff();
+      allow update: if staff() || (signedIn() && resource.data.cid == request.auth.uid && request.resource.data.cid == resource.data.cid && request.resource.data.status == resource.data.status);
+      allow delete: if staff();
     }
     match /suggestions/{id}  { allow read: if staff() || (signedIn() && resource.data.cid == request.auth.uid); allow write: if staff(); }
     match /bookings/{id}     {

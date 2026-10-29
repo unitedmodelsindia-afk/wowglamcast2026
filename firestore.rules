@@ -32,7 +32,11 @@ service cloud.firestore {
       allow update, delete: if staff();
     }
     match /suggestions/{id}  { allow read: if staff() || (signedIn() && resource.data.cid == request.auth.uid); allow write: if staff(); }
-    match /bookings/{id}     { allow read: if staff() || (signedIn() && (resource.data.cid == request.auth.uid || resource.data.mid == request.auth.uid)); allow write: if staff(); }
+    match /bookings/{id}     {
+      allow read: if staff() || (signedIn() && (resource.data.cid == request.auth.uid || resource.data.mid == request.auth.uid));
+      allow write: if staff();
+      allow update: if signedIn() && resource.data.mid == request.auth.uid && resource.data.status == 'posted' && request.resource.data.status in ['accepted','declined'] && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','rt']);
+    }
     match /posts/{id}        { allow read: if staff() || (signedIn() && resource.data.mid == request.auth.uid); allow write: if staff(); }
     function clean(t) {
       return t is string && t.size() > 0 && t.size() <= 500 &&
@@ -42,7 +46,7 @@ service cloud.firestore {
     match /chats/{id} {
       allow read: if staff() || inChat(id) || (signedIn() && (resource.data.cid == request.auth.uid || resource.data.mid == request.auth.uid));
       allow create: if signedIn() && id == request.auth.uid + '_' + request.resource.data.mid && request.resource.data.cid == request.auth.uid;
-      allow update: if staff() || (inChat(id) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['last','at']) && clean(request.resource.data.last));
+      allow update: if staff() || (inChat(id) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['last','at','lastFrom']) && clean(request.resource.data.last));
       match /m/{mid} {
         allow read: if staff() || inChat(id);
         allow create: if inChat(id) && request.resource.data.from == request.auth.uid && clean(request.resource.data.t);

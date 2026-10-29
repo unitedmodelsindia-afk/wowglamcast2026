@@ -138,7 +138,7 @@ async function load(){
    const d=await getDoc(doc(db,"models",S.user.uid));S.mine=d.exists()?d.data():null;
    if(S.mine){try{const ph=await getDoc(doc(db,"photos",S.user.uid));S.full[S.user.uid]=ph.exists()?ph.data().ps||[]:[]}catch(_){}const p=await getDoc(doc(db,"private",S.user.uid));S.priv=p.exists()?p.data():{};S.posts=await cq("posts","mid");try{S.bk=await cq("bookings","mid")}catch(_){S.bk=[]}try{S.chats=await cq("chats","mid")}catch(_){S.chats=[]}
     const b=await getDoc(doc(db,"busy",S.user.uid));S.busy=b.exists()?b.data().dates||[]:[]}}
- }catch(e){console.error(e);S.err="Could not load data."}
+ }catch(e){console.error(e);S.err="Could not load data ("+((e&&e.code)||(e&&e.message)||"error").toString().slice(0,80)+"). Pull down or reopen the app."}
 }
 async function go(v){const gt=S.gt=(S.gt||0)+1;S.v=v;S.err="";S.ld=true;render();await load();if(gt!==S.gt)return;S.ld=false;if(S.v==="opps"){localStorage.setItem("wg_so",Date.now());S.nOpp=0}if(S.v==="prof")loadFull(fl().slice(0,S.pn));if(S.v==="req")setTimeout(()=>{localStorage.setItem("wg_sa",Date.now())},500);render();if(S.user&&!S.user.isAnonymous){await counts();if(S.v==="req")S.nApp=0;render()}}
 const getRole=async uid=>{try{const d=await getDoc(doc(db,"users",uid));return d.exists()?d.data().role:""}catch(_){return""}};

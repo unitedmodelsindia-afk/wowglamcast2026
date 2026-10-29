@@ -59,7 +59,7 @@ input[type=checkbox]{width:auto;margin-right:8px}
 </style></head><body><div id="app"></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {serverTimestamp,limit,getFirestore,initializeFirestore,persistentLocalCache,persistentMultipleTabManager,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,getDocs,query,where,addDoc,onSnapshot,orderBy,writeBatch,arrayUnion} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const DC=window.DC||{cfg:{apiKey:"PASTE_API_KEY",authDomain:"PASTE",projectId:"PASTE",appId:"PASTE"},support:"wowglamentertainment@gmail.com"};
@@ -127,20 +127,29 @@ async function load(){
 }
 async function go(v){S.v=v;S.err="";render();await load();render()}
 const getRole=async uid=>{try{const d=await getDoc(doc(db,"users",uid));return d.exists()?d.data().role:""}catch(_){return""}};
-async function login(want){
- S.err="";resetS();
- if(!auth){S.err="App setup incomplete: add Firebase keys in config.js.";S.v="home";return render()}
- try{const u=(await signInWithPopup(auth,new GoogleAuthProvider())).user;S.user=u;
-  if(want==="admin"){if(isAdmin(u)){S.mgr=false;return await go("admin")}if(await isMgr(u)){S.mgr=true;return await go("admin")}await signOut(auth);S.user=null;S.err="Not an admin.";S.v="home";return render()}
+const IOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+const APPMODE=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true||document.referrer.startsWith("android-app://")||/; wv\)/.test(navigator.userAgent);
+const loginErr=e=>e&&e.code==="auth/unauthorized-domain"?"Login blocked: add this website domain in Firebase > Authentication > Settings > Authorized domains.":e&&e.code==="auth/popup-closed-by-user"?"Login cancelled.":"Login failed ("+((e&&e.code)||"error")+"). Please try again.";
+async function afterLogin(u,want){S.user=u;
+  if(want==="admin"){if(isAdmin(u)){S.mgr=false;return await go("admin")}if(await isMgr(u)){S.mgr=true;return await go("admin")}await signOut(auth);S.user=null;S.err="Not an admin: "+(u.email||"")+" is not on the admin list.";S.v="home";return render()}
   const want2=want==="client"?"client":"model";let r=await getRole(u.uid);
   if(!r){await setDoc(doc(db,"users",u.uid),{role:want2,at:Date.now()});r=want2}
   S.role=r;if(S.tp&&location.hash.startsWith("#t=")){S.back=r==="client"?"prof":"model";return await go("tp")}await go(r==="client"?"req":"model")}
- catch(e){console.error(e);S.err=e&&e.code==="auth/unauthorized-domain"?"Login blocked: add this website domain in Firebase > Authentication > Settings > Authorized domains.":e&&e.code==="auth/popup-closed-by-user"?"Login cancelled.":"Login failed. Please try again.";S.v="home";render()}
+async function viaRedirect(want){try{localStorage.setItem("wgWant",want)}catch(_){}await signInWithRedirect(auth,new GoogleAuthProvider().setCustomParameters({prompt:"select_account"}))}
+async function login(want){
+ S.err="";resetS();
+ if(!auth){S.err="App setup incomplete: add Firebase keys in config.js.";S.v="home";return render()}
+ if(APPMODE&&!IOS)return viaRedirect(want);
+ try{const u=(await signInWithPopup(auth,new GoogleAuthProvider().setCustomParameters({prompt:"select_account"}))).user;await afterLogin(u,want)}
+ catch(e){console.error(e);if(e&&["auth/popup-blocked","auth/operation-not-supported-in-this-environment","auth/web-storage-unsupported","auth/internal-error"].includes(e.code))return viaRedirect(want);S.err=loginErr(e);S.v="home";render()}
 }
+if(auth){getRedirectResult(auth).then(async r=>{let w="";try{w=localStorage.getItem("wgWant")||"";localStorage.removeItem("wgWant")}catch(_){}const u=(r&&r.user)||(w&&auth.currentUser);if(u)await afterLogin(u,w||"model")}).catch(e=>{console.error(e);try{localStorage.removeItem("wgWant")}catch(_){}S.err=loginErr(e);S.v="home";render()})}
 
 if(auth){
   onAuthStateChanged(auth, async u => {
     S.user = u;
+    let pend=""; try{pend=localStorage.getItem("wgWant")||""}catch(_){}
+    if (u && pend) { if (!S.started) { S.started = true; render(); } return; }
     if (u) {
       if (isAdmin(u)) { S.mgr = false; if (S.pendTp) { S.back = "admin"; S.pendTp = ""; await go("tp"); } else if (S.v !== "admin") await go("admin"); }
       else if (await isMgr(u)) { S.mgr = true; if (S.v !== "admin") await go("admin"); }

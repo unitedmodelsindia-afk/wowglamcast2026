@@ -6,6 +6,11 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#1a120c">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wow Glam">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#1a120c;--bg2:#241a12;--line:#5a4720;--gold:#cfaa4a;--tx:#f6efe0;--mut:#cdbea4;--ok:#7fb069;--bad:#d9685a;--inp:#2a1d13}
@@ -135,6 +140,7 @@ if(auth){
 }
 
 function matches(r){return S.list.filter(m=>m.v&&RANK[m.t||"C"]<=RANK[r.tier]&&(r.cat==="Any"||m.cat===r.cat)&&!((S.busyMap[m.uid]||{}).dates||[]).includes(r.date)).map(m=>({m,s:50,w:["match"]}))}
+const standalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
 const head=()=>`<header><span class="logo">Wow Glam Digital Cast</span><span class="ic">${S.user?'<button class="btn ghost sm" data-a="out">Log out</button>':''}</span></header>`;
 const errb=()=>(S.err?`<div class="err">${esc(S.err)}</div>`:"");
 const tabs=()=>`<div class="seg" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">${[["req","Requirements"],["prof","Profiles"],["mybook","Bookings"]].map(t=>`<button data-a="tab" data-v="${t[0]}" class="${S.v===t[0]?"on":""}">${t[1]}</button>`).join("")}</div>`;
@@ -152,7 +158,7 @@ const prepPhoto=async f=>{const img=new Image();const u=URL.createObjectURL(f);r
 
 function render(){
  let h="";
- if(S.v==="home")h=`<main><div class="hero"><div class="logo" style="font-size:44px">Wow Glam Digital Cast</div><p class="sub">Private talent casting ecosystem.</p></div><button class="btn" data-a="client">Brand / Client: Log in</button><button class="btn ghost" data-a="model">Talent: Log in</button><button class="btn ghost" data-a="admin">Admin</button>${errb()}</main>`;
+ if(S.v==="home")h=`<main><div class="hero"><div class="logo" style="font-size:44px">Wow Glam Digital Cast</div><p class="sub">Private talent casting ecosystem.</p></div><button class="btn" data-a="client">Brand / Client: Log in</button><button class="btn ghost" data-a="model">Talent: Log in</button><button class="btn ghost" data-a="admin">Admin</button>${errb()}${standalone()?"":`<div class="seg" style="margin-top:22px"><a class="btn ghost sm" style="text-align:center;text-decoration:none;padding:12px" href="wowglam.apk" download>Android App</a><button class="btn ghost sm" style="padding:12px" data-a="ios">iPhone App</button></div>`}</main>`;
  else if(S.v==="brandprofile")h=`${head()}<main><h2>Brand profile</h2>${errb()}<label>Company / Brand Name</label><input id="bc"><label>Contact Person</label><input id="bp"><label>City</label><input id="bt"><label>Mobile</label><input id="bm" type="tel" inputmode="numeric" maxlength="10"><label style="display:flex;align-items:flex-start"><input type="checkbox" id="bok">I agree that the Wow Glam Digital Cast team can see my contact details (mobile and email) to coordinate castings.</label><button class="btn" data-a="savebrand">Save and Continue</button></main>`;
  else if(S.v==="req")h=`${head()}<main>${tabs()}<h2>Requirements</h2><button class="btn" data-a="newreq">Post Requirement</button>${errb()}${S.reqs.length?S.reqs.map(r=>`<div class="item"><div class="g"><b>${esc(r.cat||"Any")} · ${esc(r.city)} · ${esc(r.date)}</b><div class="sub">${esc(RST[r.status]||r.status||"")}</div></div></div>`).join(""):`<div class="empty"><div class="big">📋</div>No requirements yet.</div>`}</main>`;
  else if(S.v==="prof")h=`${head()}<main>${tabs()}<h2>Profiles</h2>${S.list.length?S.list.map(m=>mcard(m,`<button class="btn sm${S.likes.includes(m.uid)?" ghost":""}" data-a="like" data-v="${m.uid}">${S.likes.includes(m.uid)?"Liked":"Like"}</button>`)).join(""):`<div class="empty"><div class="big">✨</div>No profiles yet.</div>`}</main>`;
@@ -164,7 +170,7 @@ function render(){
   else if(at==="clients")body=bn?S.brands.map(b=>`<div class="item"><div class="g adm"><b>${esc(b.cn)}</b><div class="sub">${esc(b.pn)} · ${esc(b.city)}</div><div>${tel(b.mobile)}</div><div>${mail(b.email)}</div></div></div>`).join(""):`<div class="empty"><div class="big">🏢</div>No clients yet.</div>`;
   else{const bm={};S.brands.forEach(b=>bm[b.uid||b.id]=b);body=S.reqs.length?S.reqs.map(r=>{const b=bm[r.cid]||{};return`<div class="item"><div class="g adm"><b>${esc(r.cat||"Any")} · ${esc(r.city)} · ${esc(r.date)}</b><div class="sub">${esc(r.cn||b.cn||"")} · ${esc(b.pn||"")}</div><div>${tel(b.mobile)}</div></div></div>`}).join(""):`<div class="empty"><div class="big">📋</div>No requirements yet.</div>`}
   h=head()+`<main><h2>Admin Dashboard</h2><div class="stat" style="margin-bottom:14px"><div><b>${S.list.length}</b>Talent</div><div><b>${bn}</b>Clients</div></div><div class="seg" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">${[["talent","Talent"],["clients","Clients"],["reqs","Requirements"]].map(t=>`<button data-a="atab" data-v="${t[0]}" class="${at===t[0]?"on":""}">${t[1]}</button>`).join("")}</div>${errb()}${body}</main>`}
- app.innerHTML=h+(S.sheet==="req"?`<div class="sheet"><div class="sh"><h2>Post Requirement</h2>${errb()}<label>Company</label><input id="cn" value="${esc((S.brand||{}).cn||"")}"><label>Category</label><select id="rc"><option>Any</option>${CATS.map(c=>`<option>${c}</option>`).join("")}</select><label>City</label><input id="rct"><label>Date</label><input id="dt" type="date" min="${todayStr()}"><button class="btn" data-a="sendreq">Submit</button><button class="btn ghost" data-a="close">Cancel</button></div></div>`:"");
+ app.innerHTML=h+(S.sheet==="ios"?`<div class="sheet"><div class="sh"><h2>Install on iPhone</h2><div class="steps"><div><b>1.</b> Open this page in <b>Safari</b>.</div><div><b>2.</b> Tap the <b>Share</b> button (square with arrow) at the bottom.</div><div><b>3.</b> Tap <b>Add to Home Screen</b>, then <b>Add</b>.</div><div><b>4.</b> Open <b>Wow Glam</b> from your home screen like any app.</div></div><button class="btn" data-a="close">Got it</button></div></div>`:"")+(S.sheet==="req"?`<div class="sheet"><div class="sh"><h2>Post Requirement</h2>${errb()}<label>Company</label><input id="cn" value="${esc((S.brand||{}).cn||"")}"><label>Category</label><select id="rc"><option>Any</option>${CATS.map(c=>`<option>${c}</option>`).join("")}</select><label>City</label><input id="rct"><label>Date</label><input id="dt" type="date" min="${todayStr()}"><button class="btn" data-a="sendreq">Submit</button><button class="btn ghost" data-a="close">Cancel</button></div></div>`:"");
 }
 
 document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,v=b.dataset.v;
@@ -179,6 +185,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]")
  if(a==="out"){try{await signOut(auth)}catch(_){}resetS();S.user=null;return go("home")}
  S.err="";
  if(a==="newreq")S.sheet="req";
+ else if(a==="ios")S.sheet="ios";
  else if(a==="close")S.sheet=false;
  else if(a==="savebrand"){const bm=val("bm").replace(/\D/g,"");if(!val("bc").trim()||!val("bp").trim()||!val("bt").trim())S.err="Please fill all fields.";else if(!/^[6-9]\d{9}$/.test(bm))S.err="Enter a valid 10-digit mobile number.";else if(!$("#bok").checked)S.err="Please tick the consent box.";else{try{await setDoc(doc(db,"brands",S.user.uid),{uid:S.user.uid,cn:val("bc").trim(),pn:val("bp").trim(),city:val("bt").trim(),mobile:bm,email:S.user.email||"",consent:Date.now(),at:Date.now()});return go("req")}catch(err){console.error(err);S.err="Could not save. Please try again."}}}
  else if(a==="sendreq"){if(!val("cn").trim()||!val("rct").trim()||!val("dt"))S.err="Please fill company, city and date.";else{try{await addDoc(collection(db,"requirements"),{cid:S.user.uid,cn:val("cn").trim(),cat:val("rc")||"Any",city:val("rct").trim(),date:val("dt"),status:"new",at:Date.now()});S.sheet=false;toast("Requirement posted");await load()}catch(err){console.error(err);S.err="Could not post. Please try again."}}}

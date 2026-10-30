@@ -12,6 +12,7 @@ service cloud.firestore {
       return signedIn() && request.auth.token.email_verified == true &&
         exists(/databases/$(database)/documents/managers/$(request.auth.token.email.lower()));
     }
+    function isOwner() { return signedIn() && request.auth.token.email_verified == true && request.auth.token.email == 'unitedmodelsindia@gmail.com'; }
     function staff() { return isAdmin() || isMgr(); }
 
     match /users/{uid}       { allow read, write: if me(uid) || isAdmin(); }
@@ -22,7 +23,7 @@ service cloud.firestore {
     match /busy/{uid}        { allow read: if signedIn(); allow write: if me(uid) || staff(); }
     match /likes/{uid}       { allow read, write: if me(uid) || staff(); }
     match /blocked/{uid}     { allow read: if me(uid) || staff(); allow write: if isAdmin(); }
-    match /managers/{email}  { allow read: if isAdmin() || (signedIn() && request.auth.token.email.lower() == email); allow write: if isAdmin(); }
+    match /managers/{email}  { allow read: if isAdmin() || (signedIn() && request.auth.token.email.lower() == email); allow create, update: if isAdmin(); allow delete: if isOwner(); }
     match /settings/{id}     { allow read: if signedIn(); allow write: if isAdmin(); }
     match /notes/{id}        { allow read, write: if isAdmin(); }
     match /logs/{id}         { allow create: if signedIn(); allow read: if isAdmin(); }
